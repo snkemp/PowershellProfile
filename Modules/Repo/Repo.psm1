@@ -277,10 +277,10 @@ function Open-Repository()
 function Repository()
 {
     Param( [string] $Command, [string[]] $Arguments )
-
+	
 	if( -not $RepositoryCommands.Contains($Command) )
 	{
-		Write-Host "Invalid command $Command. command must be an element of the set {" ($RepositoryCommands -join ", ") "}
+		Write-Host "Invalid command '$Command'. command must be an element of the set {" ($RepositoryCommands -join ", ") "}
 or "
 		Repository-Help
 		Display-Repositories
@@ -297,6 +297,7 @@ or "
 		$CommandHelp
 		{
 			Repository-Help
+			Repository-List
 		}
 		
 		$CommandSave
@@ -336,7 +337,11 @@ function Repo()
 		$Parameters = @()
 	}
 	
-	if( Repository-Exists $Argument )
+	if( -not $Argument )
+	{
+		$Argument = $global:CommandList
+	}
+	elseif( Repository-Exists $Argument )
 	{
 		$Parameters = $Argument + $Parameters
 		$Argument = $global:CommandOpen

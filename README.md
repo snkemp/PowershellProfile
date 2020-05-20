@@ -10,9 +10,7 @@ This is a powershell profile, including some helpful self-built modules.
 The profile is used simply to import-modules and setup some helper variables for location
 </details>
 <details>
-
-Repo
-----
+<summary><h2>Repo</h2></summary>
 
 This module was built to help manage your different work locations and to be able to quickly move between them.
 This can be helpful when you are working on several different projects or even when working on multiple versions of a project.

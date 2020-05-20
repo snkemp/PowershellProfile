@@ -41,21 +41,18 @@ The same as `repo` with the exception that you must provide the shorthand name (
 
 #### Open-Repository
 
-Shorthand Name:	`open`
-
+Shorthand Name:	`open`  
 Arguments:		`<repository-name>`
 
 #### Create-Repository
 
-Shorthand Name:	`save`
-
+Shorthand Name:	`save`  
 Arguments:		`<repository-name> <path-to-directory>`
 
 
 #### Alter-Repository
 
-Shorthand Name: `alter`, `mv`, `set`
-
+Shorthand Name: `alter`, `mv`, `set`  
 Arguments:		`<repository-name> Name:<new-name> Path:<new-path> UseCurrentLocation:<use-current-location>`
 
 `Alter-Repository` is a special function when written shorthand.
@@ -69,8 +66,7 @@ This is effectively the save as calling `repo set <repo-name> .`
 
 #### Delete-Repository
 
-Shorthand Name:	`rm`
-
+Shorthand Name:	`rm`  
 Arguments:		`<repository-name>`
 
 Deletes the repository. Cannot be undone (yet).
@@ -78,8 +74,7 @@ Deletes the repository. Cannot be undone (yet).
 
 #### Display-Repositories
 
-Shorthand Name: `list`
-
+Shorthand Name: `list`  
 Arguments:		NONE
 
 Will display the repositories as well as the relative path (root of development).
@@ -87,8 +82,7 @@ Will display the repositories as well as the relative path (root of development)
 
 #### Repository-Help
 
-Shorthand Name:	`help`, NONE
-
+Shorthand Name:	`help`, NONE  
 Arguments:		NONE
 
 Will display the help.

@@ -297,7 +297,7 @@ or "
 		$CommandHelp
 		{
 			Repository-Help
-			Repository-List
+			Display-Repositories
 		}
 		
 		$CommandSave

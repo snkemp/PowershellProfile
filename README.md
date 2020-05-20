@@ -5,11 +5,7 @@ This is a powershell profile, including some helpful self-built modules.
 
 
 <details>
-<summary>
-
-Profile
--------
-</summary>
+<summary><h2>Profile</h2></summary>
 
 The profile is used simply to import-modules and setup some helper variables for location
 </details>
@@ -26,10 +22,7 @@ We store two items: a relative path (the root of all your development),
 and a map of repository names and repository locations.
 
 <details>
-<summary>
-
-#### Repo
-</summary>
+<summary><h4>Repo</h2></summary>
 
 This is the shorthand method for accessing all the other functions. 
 Simply call `repo` and the short name of the method you want and then use the parameters as normal.
@@ -50,39 +43,27 @@ Providing no arguments is the same as `repo help`
 In general they would be either names for your repositories or directories for the path location.
 
 </details>
-<details>
-<summary>
-
-#### Repository
-</summary>
+<summary><h4>Repository</h2></summary>
 
 The same as `repo` with the exception that you must provide the shorthand name (otherwise it will throw an error).
 
 </details>
 <details>
-<summary>
+<summary><h2>Open-Repository</h2></summary>
 
-#### Open-Repository
-</summary>
 Shorthand Name:	`open`
 Arguments:		`<repository-name>`
 
 </details>
 <details>
-<summary>
-
-#### Create-Repository
-</summary>
+<summary><h2>Create-Repository</h2></summary>
 
 Shorthand Name:	`save`
 Arguments:		`<repository-name> <path-to-directory>`
 
 </details>
 <details>
-<summary>
-
-#### Alter-Repository
-</summary>
+<summary><h2>Alter-Repository</h2></summary>
 
 Shorthand Name: `alter`, `mv`, `set`
 Arguments:		`<repository-name> Name:<new-name> Path:<new-path> UseCurrentLocation:<use-current-location>
@@ -97,10 +78,7 @@ This is effectively the save as calling `repo set <repo-name> .`
 
 </details>
 <details>
-<summary>
-
-#### Delete-Repository
-</summary>
+<summary><h2>Delete-Repository</h2></summary>
 
 Shorthand Name:	`rm`
 Arguments:		`<repository-name>`
@@ -109,10 +87,7 @@ Deletes the repository. Cannot be undone (yet).
 
 </details>
 <details>
-<summary>
-
-#### Display-Repositories
-</summary>
+<summary><h4>Display-Repositories</h4></summary>
 
 Shorthand Name: `list`
 Arguments:		NONE
@@ -121,10 +96,7 @@ Will display the repositories as well as the relative path (root of development)
 
 </details>
 <details>
-<summary>
-
-#### Repository-Help
-</summary>
+<summary><h2>Repository-Help</h2></summary>
 
 Shorthand Name:	`help`, NONE
 Arguments:		NONE

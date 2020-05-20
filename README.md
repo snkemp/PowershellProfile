@@ -5,8 +5,10 @@ This is a powershell profile, including some helpful self-built modules.
 
 
 <details>
+<summary>
 Profile
 -------
+</summary>
 The profile is used simply to import-modules and setup some helper variables for location
 </details>
 <details>
@@ -21,8 +23,10 @@ We store two items: a relative path (the root of all your development),
 and a map of repository names and repository locations.
 
 <details>
-
+<summary>
 #### Repo
+</summary>
+
 This is the shorthand method for accessing all the other functions. 
 Simply call `repo` and the short name of the method you want and then use the parameters as normal.
 
@@ -43,31 +47,34 @@ In general they would be either names for your repositories or directories for t
 
 </details>
 <details>
-
+<summary>
 #### Repository
+</summary>
 
 The same as `repo` with the exception that you must provide the shorthand name (otherwise it will throw an error).
 
 </details>
 <details>
-
+<summary>
 #### Open-Repository
-
+</summary>
 Shorthand Name:	`open`
 Arguments:		`<repository-name>`
 
 </details>
 <details>
-
+<summary>
 #### Create-Repository
+</summary>
 
 Shorthand Name:	`save`
 Arguments:		`<repository-name> <path-to-directory>`
 
 </details>
 <details>
-
+<summary>
 #### Alter-Repository
+</summary>
 
 Shorthand Name: `alter`, `mv`, `set`
 Arguments:		`<repository-name> Name:<new-name> Path:<new-path> UseCurrentLocation:<use-current-location>
@@ -82,8 +89,9 @@ This is effectively the save as calling `repo set <repo-name> .`
 
 </details>
 <details>
-
+<summary>
 #### Delete-Repository
+</summary>
 
 Shorthand Name:	`rm`
 Arguments:		`<repository-name>`
@@ -92,8 +100,9 @@ Deletes the repository. Cannot be undone (yet).
 
 </details>
 <details>
-
+<summary>
 #### Display-Repositories
+</summary>
 
 Shorthand Name: `list`
 Arguments:		NONE
@@ -102,8 +111,9 @@ Will display the repositories as well as the relative path (root of development)
 
 </details>
 <details>
-
+<summary>
 #### Repository-Help
+</summary>
 
 Shorthand Name:	`help`, NONE
 Arguments:		NONE

@@ -6,12 +6,15 @@ This is a powershell profile, including some helpful self-built modules.
 
 <details>
 <summary>
+
 Profile
 -------
 </summary>
+
 The profile is used simply to import-modules and setup some helper variables for location
 </details>
 <details>
+
 Repo
 ----
 
@@ -24,6 +27,7 @@ and a map of repository names and repository locations.
 
 <details>
 <summary>
+
 #### Repo
 </summary>
 
@@ -48,6 +52,7 @@ In general they would be either names for your repositories or directories for t
 </details>
 <details>
 <summary>
+
 #### Repository
 </summary>
 
@@ -56,6 +61,7 @@ The same as `repo` with the exception that you must provide the shorthand name (
 </details>
 <details>
 <summary>
+
 #### Open-Repository
 </summary>
 Shorthand Name:	`open`
@@ -64,6 +70,7 @@ Arguments:		`<repository-name>`
 </details>
 <details>
 <summary>
+
 #### Create-Repository
 </summary>
 
@@ -73,6 +80,7 @@ Arguments:		`<repository-name> <path-to-directory>`
 </details>
 <details>
 <summary>
+
 #### Alter-Repository
 </summary>
 
@@ -90,6 +98,7 @@ This is effectively the save as calling `repo set <repo-name> .`
 </details>
 <details>
 <summary>
+
 #### Delete-Repository
 </summary>
 
@@ -101,6 +110,7 @@ Deletes the repository. Cannot be undone (yet).
 </details>
 <details>
 <summary>
+
 #### Display-Repositories
 </summary>
 
@@ -112,6 +122,7 @@ Will display the repositories as well as the relative path (root of development)
 </details>
 <details>
 <summary>
+
 #### Repository-Help
 </summary>
 

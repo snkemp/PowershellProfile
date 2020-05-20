@@ -1,17 +1,103 @@
 # Repo
 
+
 #region Public Static Variables
-$global:RepositoryStorageRoot = "$ModulePath\Repo\"
-$global:RepositoryStorage_Repositories = "$RepositoryStorageRoot\repositories.xml"
-$global:RepositoryStorage_RelativePath = "$RepositoryStorageRoot\relativePath.xml"
+$global:RepositoryStorageRoot = "$($global:ModulePath)\Repo\"
+$global:RepositoryStorage_Repositories = "$($global:RepositoryStorageRoot)\repositories.xml"
+$global:RepositoryStorage_RelativePath = "$($global:RepositoryStorageRoot)\relativePath.xml"
+
+$global:CommandList = "list"
+$global:CommandHelp = "help"
+$global:CommandSave = "save"
+$global:CommandAlter = "alter"
+$global:CommandAlterName = "mv"
+$global:CommandAlterPath = "set"
+$global:CommandDelete = "rm"
+$global:CommandOpen = "open"
+$global:RepositoryCommands = [System.Collections.Generic.HashSet[string]] @(
+	$CommandList,
+	$CommandHelp,
+	$CommandSave,
+	$CommandAlter,
+	$CommandAlterName,
+	$CommandAlterPath,
+	$CommandDelete,
+	$CommandOpen)
 #endregion
 
 #region Internal State
 $global:Repositories = @{}
-$global:RelativePath = "$Home\Documents\Development"
+$global:RelativePath = (Resolve-Path "~\Documents\Development").Path
 #endregion
 
 #region Internal Helpers
+
+function Path-Name()
+{
+	Param([string] $Path)
+	Write-Host $Path
+	return (Resolve-Path $Path).Path;
+}
+
+function Current-Location()
+{
+	return (Path-Name .)
+}
+
+function Get-Relative-Path()
+{
+	return $global:RelativePath
+}
+
+function Set-Relative-Path()
+{
+	Param( [string] $Path )
+	$global:RelativePath = (Path-Name $Path)
+}
+
+function Get-Repository-Names()
+{
+	return $global:Repositories.Keys
+}
+
+function Get-Repository-Locations()
+{
+	return $global:Repositories.Values
+}
+
+function Get-Repository()
+{
+	Param( [string] $Name )
+	return (Path-Name $global:Repositories[$Name])
+}
+
+function Set-Repository()
+{
+	Param( [string] $Name, [string] $Location )
+	$global:Repositories[$Name] = $Location
+}
+
+function Repository-Exists()
+{
+	Param( [string] $Name )
+	return $global:Repositories.Contains($Name)
+}
+
+function Is-Repository()
+{
+	Param( [string] $Path )
+	$Path = Path-Name $Path
+	foreach($key in (Get-Repository-Names))
+	{
+		if( (Get-Repository $key) -eq $Path )
+		{
+			return $key
+		}
+	}
+	
+	return $false
+}
+
 function Validate-Repository()
 {
 	Param(
@@ -35,90 +121,69 @@ function Validate-Repository()
 	}
 }
 
-function Current-Location()
+function Format-Repository()
 {
-	return (Resolve-Path .).ToString()
+	Param( [string] $Repo )
+	$Path = (Get-Repository $Repo).Replace((Get-Relative-Path), "~~\")
+	return "`t$Repo`t`t`t$Path"
 }
 
-function Get-Repository-Names()
+function Format-Repositories()
 {
-	return $global:Repositories.Keys
-}
-
-function Get-Repository-Locations()
-{
-	return $global:Repositories.Values
-}
-
-function Get-Repository()
-{
-	Param( [string] $Name )
-	return $Repositories[$Name]
-}
-
-function Set-Repository()
-{
-	Param( [string] $Name, [string] $Location )
-	$Repositories[$Name] = $Location
-}
-
-function Repository-Exists()
-{
-	Param( [string] $Name )
-	return $Repositories.Contains($Name)
-}
-
-function Get-Relative-Path()
-{
-	return $RelativePath
+	return (( Get-Repository-Names | Sort-Object -Descending | ForEach { (Format-Repository $_) } ) -join "`n")
 }
 #endregion
 
 #region State Permanence
 function Repository-Initialize-Module()
 {
-	$reposXml = (Get-Item "$global:Storage\repositories.xml" -ErrorAction Ignore)
+	$reposXml = (Get-Item $global:RepositoryStorage_Repositories -ErrorAction Ignore)
 	if( $reposXml )
 	{
 		Load-Repositories
 	}
 	else
 	{
-		$inputPath = Read-Host "Please enter a path to the root of your development. Current value is '$global:RelativePath'"
-		if( $inputPath -ne "" ) { $RelativePath = $inputPath }
-		if( -not (Get-Item $RelativePath -ErrorAction Ignore) ) { mkdir $inputPath }
+		$inputPath = Read-Host "Please enter a path to the root of your development. Current value is '$RelativePath'"
+		if( $inputPath -ne "" ) { Set-Relative-Path $inputPath }
+		if( -not (Get-Item (Get-Relative-Path) -ErrorAction Ignore) ) { mkdir $inputPath }
 
 		Create-Repository -Name "~" -Path "~"
-		Create-Repository -Name "root" -Path $global:RelativePath
+		Create-Repository -Name "root" -Path $RelativePath
 		Save-Repositories
 	}
 }
 
 function Load-Repositories()
 {
-	Import-CliXml -LiteralPath $RepositoryStorage_Repositories -OutVariable $Repositories
-	Import-CliXml -LiteralPath $RepositoryStorage_RelativePath -OutVariable $RelativePath
+	$global:Repositories = Import-CliXml -LiteralPath $global:RepositoryStorage_Repositories
+	$global:RelativePath = Import-CliXml -LiteralPath $global:RepositoryStorage_RelativePath
 }
 
 function Save-Repositories()
 {
-	Export-CliXml -LiteralPath $RepositoryStorage_Repositories -InputObject $Repositories
-	Export-CliXml -LiteralPath $RepositoryStorage_RelativePath -InputObject $RelativePath
+	Export-CliXml -LiteralPath $RepositoryStorage_Repositories -InputObject Repositories
+	Export-CliXml -LiteralPath $RepositoryStorage_RelativePath -InputObject RelativePath
 }
 #endregion
 
-#region Public Functions
+#region Public API
 function Display-Repositories()
 {
 	$output = "
-	Repositories
+`tRepositories`t`t~~ = $(Get-Relative-Path)
 
-	~~				$RelativePath
-	-----------------------------------
+`tName`t`t`tPath
+`t----`t`t`t----
+$(Format-Repositories)
 
+" 
+	Write-Host $output
+}
 
-	" 
-	Echo $output
+function Repository-Help()
+{
+	# TODO
 }
 
 function Create-Repository()
@@ -130,7 +195,7 @@ function Create-Repository()
 	)
 
 	Validate-Repository $Name -ForNewRepository
-
+	
 	if( -not $Path )
 	{
 		if( -not $UseCurrentLocation )
@@ -140,6 +205,20 @@ function Create-Repository()
 
 		$Path = Current-Location
 	}
+	
+	$key = Is-Repository $Path
+	while( $key )
+	{
+		$continue = Read-Host "This location is already saved as repo '$key`. Would you like to continue?`nY/N:"
+		if($continue -eq "Y")
+		{
+			break
+		}
+		elseif($continue -eq "N")
+		{
+			return
+		}
+	}
 
 	Set-Repository $Name $Path
 	Save-Repositories
@@ -148,9 +227,9 @@ function Create-Repository()
 function Alter-Repository()
 {
 	Param(
-		[string] [Parameter(Required=$true, Position=0)] $Repo,
-		[string] $Path,
+		[string] [Parameter(Position=0)] $Repo,
 		[string] $Name,
+		[string] $Path,
 		[switch] $UseCurrentLocation
 	)
 
@@ -188,49 +267,110 @@ function Open-Repository()
 	Param(
 		[string] $Name
 	)
-
 	Get-Repository $Name | Set-Location
-}
-
-function Repository()
-{
-    [CmdletBinding()]
-    Param ()
-    DynamicParam {
-        
-    }
-    process {
-        # Do stuff
-    }
-}
-
-function Repo()
-{
-
 }
 
 #endregion
 
-#region Tab Complete
+#region Public global Dynamic Functions
 
-$global:tabCompletion_AlterRepository_Repo = 
+function Repository()
 {
-	Param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    Param( [string] $Command, [string[]] $Arguments )
+
+	if( -not $RepositoryCommands.Contains($Command) )
+	{
+		Write-Host "Invalid command $Command. command must be an element of the set {" ($RepositoryCommands -join ", ") "}
+or "
+		Repository-Help
+		Display-Repositories
+	}
 	
-	$validRepoNames = Get-Rpository-Names | Where { $_ -like "*$wordToComplete*" }
-	$validRepoNames | ForEach-Object {
-        New-Object -Type System.Management.Automation.CompletionResult -ArgumentList $_.Name,
-            $_.Name,
-            "ParameterValue",
-            $_.Name
-    }
+	switch( $Command )
+	{
 	
+		$CommandList
+		{
+			Display-Repositories
+		}
+		
+		$CommandHelp
+		{
+			Repository-Help
+		}
+		
+		$CommandSave
+		{
+			Create-Repository @Arguments
+		}
+		
+		{ $_ -in ($CommandAlter, $CommandAlterName, $CommandAlterPath) }
+		{
+			Alter-Repository @Arguments
+		}
+		
+		$CommandDelete
+		{
+			Delete-Repository @Arguments
+		}
+
+		$CommandOpen
+		{
+			Open-Repository @Arguments
+		}
+		
+		Default
+		{
+			Write-Host "That functionality has not been implemented yet.. We should probably fix that"
+		}
+	}
 }
-Register-ArgumentCompleter -CommandName Alter-Repository -ParameterName Repo -ScriptBlock $global:tabCompletion_AlterRepository_Repo
+
+function Repo()
+{
+	[CmdletBinding()]
+	Param( [string] $Argument, [string[]] $Parameters )
+	
+	if( $Parameters -eq $null )
+	{
+		$Parameters = @()
+	}
+	
+	if( Repository-Exists $Argument )
+	{
+		$Parameters = $Argument + $Parameters
+		$Argument = $global:CommandOpen
+	}
+
+	return (Repository $Argument @Parameters)
+}
+
+#endregion
+
+#region Dynamic Parameters and Tab Completion
+
+function RepositoryTabCompletion()
+{
+
+}
+
+function LocationTabCompletion()
+{
+
+}
+
+function FunctionTabCompletion()
+{
+
+}
+
 
 #endregion
 
 #region Aliases and Exports
 Repository-Initialize-Module
+
+Export-ModuleMember `
+	-Function Display-Repositories, Repository-Help, Create-Repository, Alter-Repository, Delete-Repository, Open-Repository, Repository, Repo
 #endregion
 

@@ -2,15 +2,11 @@ Powershell Profile
 ==================
 
 This is a powershell profile, including some helpful self-built modules.
-
-
-<details>
-<summary><h2>Profile</h2></summary>
-
 The profile is used simply to import-modules and setup some helper variables for location
-</details>
-<details>
-<summary><h2>Repo</h2></summary>
+
+
+Repo
+----
 
 This module was built to help manage your different work locations and to be able to quickly move between them.
 This can be helpful when you are working on several different projects or even when working on multiple versions of a project.
@@ -19,9 +15,7 @@ This module keeps it's state accross sessions.
 We store two items: a relative path (the root of all your development),
 and a map of repository names and repository locations.
 
-<details>
-<summary><h4>Repo</h4></summary>
-
+#### Repo
 This is the shorthand method for accessing all the other functions. 
 Simply call `repo` and the short name of the method you want and then use the parameters as normal.
 
@@ -40,28 +34,23 @@ Providing no arguments is the same as `repo help`
 `<arguments>` are dependent of the method chosen.
 In general they would be either names for your repositories or directories for the path location.
 
-</details>
-<summary><h4>Repository</h4></summary>
+#### Repository
 
 The same as `repo` with the exception that you must provide the shorthand name (otherwise it will throw an error).
 
-</details>
-<details>
-<summary><h4>Open-Repository</h4></summary>
+
+#### Open-Repository
 
 Shorthand Name:	`open`
 Arguments:		`<repository-name>`
 
-</details>
-<details>
-<summary><h4>Create-Repository</h4></summary>
+#### Create-Repository
 
 Shorthand Name:	`save`
 Arguments:		`<repository-name> <path-to-directory>`
 
-</details>
-<details>
-<summary><h4>Alter-Repository</h4></summary>
+
+#### Alter-Repository
 
 Shorthand Name: `alter`, `mv`, `set`
 Arguments:		`<repository-name> Name:<new-name> Path:<new-path> UseCurrentLocation:<use-current-location>
@@ -74,33 +63,26 @@ This is effectively the same as making a new repository with the new name and th
 Alternatively, you may substitute the `Path` argument with a `UseCurrentLocation` flag.
 This is effectively the save as calling `repo set <repo-name> .`
 
-</details>
-<details>
-<summary><h4>Delete-Repository</h4></summary>
+
+#### Delete-Repository
 
 Shorthand Name:	`rm`
 Arguments:		`<repository-name>`
 
 Deletes the repository. Cannot be undone (yet).
 
-</details>
-<details>
-<summary><h4>Display-Repositories</h4></summary>
+
+#### Display-Repositories
 
 Shorthand Name: `list`
 Arguments:		NONE
 
 Will display the repositories as well as the relative path (root of development).
 
-</details>
-<details>
-<summary><h4>Repository-Help</h4></summary>
+
+#### Repository-Help
 
 Shorthand Name:	`help`, NONE
 Arguments:		NONE
 
 Will display the help.
-
-
-</details>
-</details>

@@ -6,6 +6,7 @@ $global:RepositoryStorageRoot = "$($global:ModulePath)\Repo\"
 $global:RepositoryStorage_Repositories = "$($global:RepositoryStorageRoot)\repositories.xml"
 $global:RepositoryStorage_RelativePath = "$($global:RepositoryStorageRoot)\relativePath.xml"
 
+$global:CommandClean = "clean"
 $global:CommandList = "list"
 $global:CommandHelp = "help"
 $global:CommandSave = "save"
@@ -15,6 +16,7 @@ $global:CommandAlterPath = "set"
 $global:CommandDelete = "rm"
 $global:CommandOpen = "open"
 $global:RepositoryCommands = [System.Collections.Generic.HashSet[string]] @(
+	$CommandClean,
 	$CommandList,
 	$CommandHelp,
 	$CommandSave,
@@ -35,7 +37,6 @@ $global:RelativePath = (Resolve-Path "~\Documents\Development").Path
 function Path-Name()
 {
 	Param([string] $Path)
-	Write-Host $Path
 	return (Resolve-Path $Path).Path;
 }
 
@@ -74,7 +75,17 @@ function Get-Repository()
 function Set-Repository()
 {
 	Param( [string] $Name, [string] $Location )
+	
 	$global:Repositories[$Name] = $Location
+	Save-Repositories
+}
+
+function Delete-Repository()
+{
+	Param( [string] $Name )
+	
+	$global:Repositories.Remove($Name)
+	Save-Repositories
 }
 
 function Repository-Exists()
@@ -124,13 +135,15 @@ function Validate-Repository()
 function Format-Repository()
 {
 	Param( [string] $Repo )
-	$Path = (Get-Repository $Repo).Replace((Get-Relative-Path), "~~\")
-	return "`t$Repo`t`t`t$Path"
+	$Path = (Get-Repository $Repo).Replace((Get-Relative-Path), "~~")
+	$Repo = $Repo.PadRight(32)
+	return "`t$Repo$Path"
 }
 
 function Format-Repositories()
 {
-	return (( Get-Repository-Names | Sort-Object -Descending | ForEach { (Format-Repository $_) } ) -join "`n")
+	$Names = Get-Repository-Names
+	return (( Get-Repository-Names | Sort { Get-Repository $_ } | ForEach { (Format-Repository $_) } ) -join "`n")
 }
 #endregion
 
@@ -150,7 +163,6 @@ function Repository-Initialize-Module()
 
 		Create-Repository -Name "~" -Path "~"
 		Create-Repository -Name "root" -Path $RelativePath
-		Save-Repositories
 	}
 }
 
@@ -162,12 +174,18 @@ function Load-Repositories()
 
 function Save-Repositories()
 {
-	Export-CliXml -LiteralPath $RepositoryStorage_Repositories -InputObject Repositories
-	Export-CliXml -LiteralPath $RepositoryStorage_RelativePath -InputObject RelativePath
+	Export-CliXml -LiteralPath $RepositoryStorage_Repositories -InputObject $global:Repositories
+	Export-CliXml -LiteralPath $RepositoryStorage_RelativePath -InputObject $global:RelativePath
 }
 #endregion
 
 #region Public API
+function Clean-Repositories()
+{
+	Get-Repository-Names | Where { ((Get-Repository $_) -eq $null) -or ((Get-Item $_ -ErrorAction Ignore) -eq $null) } | ForEach { Remove-Repository $_ }
+}
+
+
 function Display-Repositories()
 {
 	$output = "
@@ -184,6 +202,8 @@ $(Format-Repositories)
 function Repository-Help()
 {
 	# TODO
+	Cat "$global:ProfilePath/README.md"
+	Display-Repositories
 }
 
 function Create-Repository()
@@ -205,6 +225,7 @@ function Create-Repository()
 
 		$Path = Current-Location
 	}
+	$Path = Path-Name $Path
 	
 	$key = Is-Repository $Path
 	while( $key )
@@ -247,26 +268,25 @@ function Alter-Repository()
 
 	if( $Name )
 	{
-		Create-Repository $Name (Get-Repository $Repo)
-		Delete-Repository $Repo
+		$repoPath = (Get-Repository $Repo)
+		Remove-Repository $Repo
+		Create-Repository $Name $repoPath
 	}
-
+		
 }
 
-function Delete-Repository()
+function Remove-Repository()
 {
-	Param(
-		[string] $Name
-	)
+	Param( [string] $Name )
+	
 	Validate-Repository $Name
-	$Repositories.Remove($Name)
+	Delete-Repository $Name
 }
 
 function Open-Repository()
 {
-	Param(
-		[string] $Name
-	)
+	Param( [string] $Name )
+	
 	Get-Repository $Name | Set-Location
 }
 
@@ -277,7 +297,7 @@ function Open-Repository()
 function Repository()
 {
     Param( [string] $Command, [string[]] $Arguments )
-	
+
 	if( -not $RepositoryCommands.Contains($Command) )
 	{
 		Write-Host "Invalid command '$Command'. command must be an element of the set {" ($RepositoryCommands -join ", ") "}
@@ -288,6 +308,10 @@ or "
 	
 	switch( $Command )
 	{
+		$CommandClean
+		{
+			Clean-Repositories
+		}
 	
 		$CommandList
 		{
@@ -297,11 +321,14 @@ or "
 		$CommandHelp
 		{
 			Repository-Help
-			Display-Repositories
 		}
 		
 		$CommandSave
 		{
+			if($Arguments.Length -lt 2)
+			{
+				$Arguments += @(".")
+			}
 			Create-Repository @Arguments
 		}
 		
@@ -312,7 +339,7 @@ or "
 		
 		$CommandDelete
 		{
-			Delete-Repository @Arguments
+			Remove-Repository @Arguments
 		}
 
 		$CommandOpen
@@ -329,8 +356,11 @@ or "
 
 function Repo()
 {
-	[CmdletBinding()]
-	Param( [string] $Argument, [string[]] $Parameters )
+	#[CmdletBinding()]
+	Param( 
+		[Parameter(Position=0)] [string] $Argument, 
+		[Parameter(Position=1, ValueFromRemainingArguments)] [string[]] $Parameters
+	)
 	
 	if( $Parameters -eq $null )
 	{
@@ -343,11 +373,11 @@ function Repo()
 	}
 	elseif( Repository-Exists $Argument )
 	{
-		$Parameters = $Argument + $Parameters
+		$Parameters = @($Argument) + $Parameters
 		$Argument = $global:CommandOpen
 	}
-
-	return (Repository $Argument @Parameters)
+	
+	return (Repository $Argument $Parameters)
 }
 
 #endregion
@@ -376,6 +406,6 @@ function FunctionTabCompletion()
 Repository-Initialize-Module
 
 Export-ModuleMember `
-	-Function Display-Repositories, Repository-Help, Create-Repository, Alter-Repository, Delete-Repository, Open-Repository, Repository, Repo
+	-Function Clean-Repositories, Display-Repositories, Repository-Help, Create-Repository, Alter-Repository, Remove-Repository, Open-Repository, Repository, Repo
 #endregion
 

@@ -64,7 +64,7 @@ Alternatively, you may substitute the `Path` argument with a `UseCurrentLocation
 This is effectively the save as calling `repo set <repo-name> .`
 
 
-#### Delete-Repository
+#### Remove-Repository
 
 Shorthand Name:	`rm`  
 Arguments:		`<repository-name>`

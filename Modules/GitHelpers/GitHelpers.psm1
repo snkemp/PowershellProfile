@@ -13,7 +13,7 @@ $global:LastCommits = @{}
 
 #region Public Static Variables
 $global:GitHelperCommandBranches = "branches"
-$global:GitHelperCommandBranch = "branche"
+$global:GitHelperCommandBranch = "branch"
 $global:GitHelperCommandCommit = "commit"
 $global:GitHelperCommandPush = "push"
 $global:GitHelperCommandClean = "clean"
@@ -114,17 +114,17 @@ function Git-Branch()
 	$Branch = "$Initials/$Version/$Branch"
 	if( $KeepLocalChanges )
 	{
-		git stash
 		git branch $Branch
+		git stash
 		git checkout $Branch
 		git stash pop
 	}
 	else
 	{
+		git branch $Branch
 		git stash
 		git checkout $Version
 		git pull
-		git branch $Branch
 		git checkout $Branch
 	}
 }

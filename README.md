@@ -86,3 +86,45 @@ Shorthand Name:	`help`, NONE
 Arguments:		NONE
 
 Will display the help.
+
+
+
+
+
+GitHelpers
+-----------
+
+This module was built to fast track many common git functions. Note that this module is used to help facilitate Versions.
+To keep this running smoothly it is necessary that there exists a branch for each version. If you wanted to make changes to some remote branch `Development`
+then you need to call `git checkout -b Development --track origin/Development`. You must do this for every version you will be making changes to.
+
+
+#### Git-Branches
+Exactly equivalent to calling `git branch -vv`. This outputs a verbose listing of the current branches.
+
+
+#### Git-Branch
+Using a branch name and an optional version name (defaults to master). This method will create and checkout a local branch. You must have a valid version branch.
+That is if you are making changes for some branch `Development` and you want alter a feature `Logging` you must already have a local branch `Development`.
+
+This will checkout your version and pull from the remote origin. Then we create and checkout a branch of the form `<intials>/<version>/<branch>`.
+- `<intials>` are using the `git config --global user.initials`.
+- `<version>` defaults to `master` but can be set to anything. 
+- `<branch>` is the name of the branch you passed in.
+
+There is also an optional parameter `KeepLocalChanges` this will not checkout the version branch,
+and will `git stash pop` your changes after checking out the new branch.
+
+#### Git-Commit
+This will commit your changes using the given message, and call `Git-Push`. This commit hash gets saved for usage of `Git-Cherry`
+
+
+#### Git-Push`
+This will push your commits to the remote branch (usually creating a new remote branch)
+
+#### Git-Clean
+This will clean all local branches whose remote branch has been deleted. Note this will checkout master first in case the branch you are on will be deleted.
+
+#### Git-Cherry`
+This is used in conjunction with `Git-Commit` when the `-UseLast` parameter is set, we will use the last commit to cherry-pick from.
+Note, this will not update the cached commit hash in case merge conflicts require you to make changes that should not go into other branches in future cherry-picks.

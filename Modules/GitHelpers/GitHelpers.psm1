@@ -51,13 +51,13 @@ function Determine-Last-Commit()
 
 function Get-Initials()
 {
-	return git config --global user.initials -ErrorAction Ignore
+	return git config --global user.initials
 }
 
 function Set-Initials()
 {
 	Param( [string] $Intials )
-	git config --global user.initals $Initials
+	git config --global --add user.initials $Initials
 }
 
 function Get-Current-Branch()
@@ -147,9 +147,16 @@ function Git-Push()
 
 function Git-Clean()
 {
+	$branch = Get-Current-Branch
+	git stash
+	git checkout master
+	
 	git fetch
 	git remote prune origin
-	Git-Branches | Select-String -Patter "gone" | Select-String -Pattern (Get-Initials) | ForEach { git branch -D $_.ToString().Trim().Split(" ")[0] }
+	Git-Branches | Select-String -Pattern "gone" | Select-String -Pattern (Get-Initials) | ForEach { git branch -D ($_.ToString().Trim().Split(" ")[0]) }
+	
+	git checkout $branch
+	git stash pop
 }
 
 function Git-Cherry()

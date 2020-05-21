@@ -6,25 +6,25 @@ $global:RepositoryStorageRoot = "$($global:ModulePath)\Repo\"
 $global:RepositoryStorage_Repositories = "$($global:RepositoryStorageRoot)\repositories.xml"
 $global:RepositoryStorage_RelativePath = "$($global:RepositoryStorageRoot)\relativePath.xml"
 
-$global:CommandClean = "clean"
-$global:CommandList = "list"
-$global:CommandHelp = "help"
-$global:CommandSave = "save"
-$global:CommandAlter = "alter"
-$global:CommandAlterName = "mv"
-$global:CommandAlterPath = "set"
-$global:CommandDelete = "rm"
-$global:CommandOpen = "open"
+$global:RepoCommandClean = "clean"
+$global:RepoCommandList = "list"
+$global:RepoCommandHelp = "help"
+$global:RepoCommandSave = "save"
+$global:RepoCommandAlter = "alter"
+$global:RepoCommandAlterName = "mv"
+$global:RepoCommandAlterPath = "set"
+$global:RepoCommandDelete = "rm"
+$global:RepoCommandOpen = "open"
 $global:RepositoryCommands = [System.Collections.Generic.HashSet[string]] @(
-	$CommandClean,
-	$CommandList,
-	$CommandHelp,
-	$CommandSave,
-	$CommandAlter,
-	$CommandAlterName,
-	$CommandAlterPath,
-	$CommandDelete,
-	$CommandOpen)
+	$RepoCommandClean,
+	$RepoCommandList,
+	$RepoCommandHelp,
+	$RepoCommandSave,
+	$RepoCommandAlter,
+	$RepoCommandAlterName,
+	$RepoCommandAlterPath,
+	$RepoCommandDelete,
+	$RepoCommandOpen)
 #endregion
 
 #region Internal State
@@ -296,34 +296,34 @@ function Open-Repository()
 
 function Repository()
 {
-    Param( [string] $Command, [string[]] $Arguments )
+    Param( [string] $RepoCommand, [string[]] $Arguments )
 
-	if( -not $RepositoryCommands.Contains($Command) )
+	if( -not $RepositoryCommands.Contains($RepoCommand) )
 	{
-		Write-Host "Invalid command '$Command'. command must be an element of the set {" ($RepositoryCommands -join ", ") "}
+		Write-Host "Invalid command '$RepoCommand'. command must be an element of the set {" ($RepositoryCommands -join ", ") "}
 or "
 		Repository-Help
 		Display-Repositories
 	}
 	
-	switch( $Command )
+	switch( $RepoCommand )
 	{
-		$CommandClean
+		$RepoCommandClean
 		{
 			Clean-Repositories
 		}
 	
-		$CommandList
+		$RepoCommandList
 		{
 			Display-Repositories
 		}
 		
-		$CommandHelp
+		$RepoCommandHelp
 		{
 			Repository-Help
 		}
 		
-		$CommandSave
+		$RepoCommandSave
 		{
 			if($Arguments.Length -lt 2)
 			{
@@ -332,17 +332,17 @@ or "
 			Create-Repository @Arguments
 		}
 		
-		{ $_ -in ($CommandAlter, $CommandAlterName, $CommandAlterPath) }
+		{ $_ -in ($RepoCommandAlter, $RepoCommandAlterName, $RepoCommandAlterPath) }
 		{
 			Alter-Repository @Arguments
 		}
 		
-		$CommandDelete
+		$RepoCommandDelete
 		{
 			Remove-Repository @Arguments
 		}
 
-		$CommandOpen
+		$RepoCommandOpen
 		{
 			Open-Repository @Arguments
 		}
@@ -369,12 +369,12 @@ function Repo()
 	
 	if( -not $Argument )
 	{
-		$Argument = $global:CommandList
+		$Argument = $global:RepoCommandList
 	}
 	elseif( Repository-Exists $Argument )
 	{
 		$Parameters = @($Argument) + $Parameters
-		$Argument = $global:CommandOpen
+		$Argument = $global:RepoCommandOpen
 	}
 	
 	return (Repository $Argument $Parameters)
